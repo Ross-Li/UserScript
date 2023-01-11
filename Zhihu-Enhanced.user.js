@@ -1,3 +1,4 @@
+//? What is this thing called?
 // ==UserScript==
 // @name         知乎增强
 // @name:zh-CN   知乎增强
@@ -28,6 +29,7 @@
 // @homepageURL  https://github.com/XIU2/UserScript
 // ==/UserScript==
 
+//? What does this line do?
 'use strict';
 var menu_ALL = [
     ['menu_defaultCollapsedAnswer', '默认收起回答', '默认收起回答', true],
@@ -36,9 +38,12 @@ var menu_ALL = [
     ['menu_backToTop', '快捷回到顶部 (右键两侧空白处)', '快捷回到顶部', true],
     ['menu_blockUsers', '屏蔽指定用户', '屏蔽指定用户', true],
     ['menu_customBlockUsers', '自定义屏蔽用户', '自定义屏蔽用户', 
-        ['故事档案局', '盐选推荐', '盐选科普', '盐选成长计划', '知乎盐选会员', '知乎盐选创作者', '盐选心理', '盐选健康必修课', 
-         '盐选奇妙物语', '盐选生活馆', '盐选职场', '盐选文学甄选', '盐选作者小管家', '盐选博物馆', '盐选点金', '盐选测评室', 
-         '盐选科技前沿', '盐选会员精品']],
+        [
+            '故事档案局', '盐选推荐', '盐选科普', '盐选成长计划', '知乎盐选会员', '知乎盐选创作者', 
+            '盐选心理', '盐选健康必修课', '盐选奇妙物语', '盐选生活馆', '盐选职场', '盐选文学甄选', 
+            '盐选作者小管家', '盐选博物馆', '盐选点金', '盐选测评室', '盐选科技前沿', '盐选会员精品'
+        ]
+    ],
     ['menu_blockKeywords', '屏蔽指定关键词', '屏蔽指定关键词', true],
     ['menu_customBlockKeywords', '自定义屏蔽关键词', '自定义屏蔽关键词', []],
     ['menu_blockType', '屏蔽指定类别 (视频/文章等)', '勾选 = 屏蔽该类别的信息流', ''],
@@ -54,45 +59,93 @@ var menu_ALL = [
     ['menu_typeTips', '区分问题文章', '区分问题文章', true],
     ['menu_toQuestion', '直达问题按钮', '直达问题按钮', true]
 ]
+
 var menu_ID = [];
-for (let i=0; i<menu_ALL.length; i++){ // 如果读取到的值为 null 就写入默认值
-    if (GM_getValue(menu_ALL[i][0]) == null){GM_setValue(menu_ALL[i][0], menu_ALL[i][3])};
+
+// 如果读取到的值为 null 就写入默认值
+for (let i=0; i<menu_ALL.length; i++){ 
+    if (GM_getValue(menu_ALL[i][0]) == null) {
+        GM_setValue(menu_ALL[i][0], menu_ALL[i][3])
+    };
 }
+
+//? Why do you use this function before it is defined?
 registerMenuCommand();
 
+// TODO: Need to refactor these "if" logics
 // 注册脚本菜单
 function registerMenuCommand() {
-    if (menu_ID.length > menu_ALL.length){ // 如果菜单ID数组多于菜单数组，说明不是首次添加菜单，需要卸载所有脚本菜单
-        for (let i=0;i<menu_ID.length;i++){
+    // 如果菜单ID数组多于菜单数组，说明不是首次添加菜单，需要卸载所有脚本菜单
+    if (menu_ID.length > menu_ALL.length){ 
+        for (let i=0; i<menu_ID.length; i++){
             GM_unregisterMenuCommand(menu_ID[i]);
         }
     }
-    for (let i=0;i<menu_ALL.length;i++){ // 循环注册脚本菜单
+
+    // 循环注册脚本菜单
+    for (let i=0; i<menu_ALL.length; i++){ 
         menu_ALL[i][3] = GM_getValue(menu_ALL[i][0]);
         if (menu_ALL[i][0] === 'menu_customBlockUsers') {
-            if (menu_value('menu_blockUsers')) menu_ID[i] = GM_registerMenuCommand(`#️⃣ ${menu_ALL[i][1]}`, function(){customBlockUsers()});
+            if (menu_value('menu_blockUsers')) menu_ID[i] = GM_registerMenuCommand(
+                `#️⃣ ${menu_ALL[i][1]}`,
+                function(){customBlockUsers()}
+            );
         } else if (menu_ALL[i][0] === 'menu_customBlockKeywords') {
-            if (menu_value('menu_blockKeywords')) menu_ID[i] = GM_registerMenuCommand(`#️⃣ ${menu_ALL[i][1]}`, function(){customBlockKeywords()});
+            if (menu_value('menu_blockKeywords')) 
+                menu_ID[i] = GM_registerMenuCommand(
+                    `#️⃣ ${menu_ALL[i][1]}`, 
+                    function(){customBlockKeywords()}
+                );
         } else if (menu_ALL[i][0] === 'menu_blockType') {
-            menu_ID[i] = GM_registerMenuCommand(`#️⃣ ${menu_ALL[i][1]}`, function(){menu_setting('checkbox', menu_ALL[i][1], menu_ALL[i][2], true, [menu_ALL[i+1], menu_ALL[i+2], menu_ALL[i+3], menu_ALL[i+4], menu_ALL[i+5]])});
-        } else if (menu_ALL[i][0] != 'menu_blockTypeVideo' && menu_ALL[i][0] != 'menu_blockTypeArticle' && menu_ALL[i][0] != 'menu_blockTypeTopic' && menu_ALL[i][0] != 'menu_blockTypeSearch' && menu_ALL[i][0] != 'menu_blockYanXuan') {
-            menu_ID[i] = GM_registerMenuCommand(`${menu_ALL[i][3]?'✅':'❌'} ${menu_ALL[i][1]}`, function(){menu_switch(`${menu_ALL[i][3]}`,`${menu_ALL[i][0]}`,`${menu_ALL[i][2]}`)});
+            menu_ID[i] = GM_registerMenuCommand(
+                `#️⃣ ${menu_ALL[i][1]}`, 
+                function(){menu_setting(
+                    'checkbox', 
+                    menu_ALL[i][1], 
+                    menu_ALL[i][2], 
+                    true, 
+                    [menu_ALL[i+1], 
+                    menu_ALL[i+2], 
+                    menu_ALL[i+3], 
+                    menu_ALL[i+4], 
+                    menu_ALL[i+5]]
+                )}
+            );
+        } else if ( menu_ALL[i][0] != 'menu_blockTypeVideo' && 
+                    menu_ALL[i][0] != 'menu_blockTypeArticle' && 
+                    menu_ALL[i][0] != 'menu_blockTypeTopic' && 
+                    menu_ALL[i][0] != 'menu_blockTypeSearch' && 
+                    menu_ALL[i][0] != 'menu_blockYanXuan') {
+            menu_ID[i] = GM_registerMenuCommand(
+                `${menu_ALL[i][3]?'✅':'❌'} ${menu_ALL[i][1]}`, 
+                function(){menu_switch(`${menu_ALL[i][3]}`,
+                `${menu_ALL[i][0]}`,
+                `${menu_ALL[i][2]}`)}
+            );
         }
     }
-    menu_ID[menu_ID.length] = GM_registerMenuCommand('💬 反馈 & 建议', function () {window.GM_openInTab('https://github.com/XIU2/UserScript#xiu2userscript', {active: true,insert: true,setParent: true});window.GM_openInTab('https://greasyfork.org/zh-CN/scripts/419081/feedback', {active: true,insert: true,setParent: true});});
+    menu_ID[menu_ID.length] = GM_registerMenuCommand(
+        '💬 反馈 & 建议', 
+        function () {window.GM_openInTab('https://github.com/XIU2/UserScript#xiu2userscript', 
+        {active: true,insert: true,setParent: true});
+        window.GM_openInTab('https://greasyfork.org/zh-CN/scripts/419081/feedback', 
+        {active: true,insert: true,setParent: true});}
+    );
 }
 
 
 // 菜单开关
 function menu_switch(menu_status, Name, Tips) {
-    if (menu_status == 'true'){
+    if (menu_status == 'true') {
         GM_setValue(`${Name}`, false);
         GM_notification({text: `已关闭 [${Tips}] 功能\n（点击刷新网页后生效）`, timeout: 3500, onclick: function(){location.reload();}});
-    }else{
+    } else {
         GM_setValue(`${Name}`, true);
         GM_notification({text: `已开启 [${Tips}] 功能\n（点击刷新网页后生效）`, timeout: 3500, onclick: function(){location.reload();}});
     }
-    registerMenuCommand(); // 重新注册脚本菜单
+
+    // 重新注册脚本菜单
+    registerMenuCommand(); 
 };
 
 
@@ -108,22 +161,37 @@ function menu_value(menuName) {
 
 // 脚本设置
 function menu_setting(type, title, tips, line, menu) {
-    let _br = '', _html = `<style class="zhihuE_SettingStyle">.zhihuE_SettingRoot {position: absolute;top: 50%;left: 50%;-webkit-transform: translate(-50%, -50%);-moz-transform: translate(-50%, -50%);-ms-transform: translate(-50%, -50%);-o-transform: translate(-50%, -50%);transform: translate(-50%, -50%);width: auto;min-width: 400px;max-width: 600px;height: auto;min-height: 150px;max-height: 400px;color: #535353;background-color: #fff;border-radius: 3px;}
-.zhihuE_SettingBackdrop_1 {position: fixed;top: 0;right: 0;bottom: 0;left: 0;z-index: 203;display: -webkit-box;display: -ms-flexbox;display: flex;-webkit-box-orient: vertical;-webkit-box-direction: normal;-ms-flex-direction: column;flex-direction: column;-webkit-box-pack: center;-ms-flex-pack: center;justify-content: center;overflow-x: hidden;overflow-y: auto;-webkit-transition: opacity .3s ease-out;transition: opacity .3s ease-out;}
-.zhihuE_SettingBackdrop_2 {position: absolute;top: 0;right: 0;bottom: 0;left: 0;z-index: 0;background-color: rgba(18,18,18,.65);-webkit-transition: background-color .3s ease-out;transition: background-color .3s ease-out;}
-.zhihuE_SettingRoot .zhihuE_SettingHeader {padding: 10px 20px;color: #fff;font-weight: bold;background-color: #3994ff;border-radius: 3px 3px 0 0;}
-.zhihuE_SettingRoot .zhihuE_SettingMain {padding: 10px 20px;border-radius: 0 0 3px 3px;}
-.zhihuE_SettingHeader span {float: right;cursor: pointer;}
-.zhihuE_SettingMain input {margin: 10px 6px 10px 0;cursor: pointer;vertical-align:middle}
-.zhihuE_SettingMain label {margin-right: 20px;user-select: none;cursor: pointer;vertical-align:middle}
-.zhihuE_SettingMain hr {border: 0.5px solid #f4f4f4;}
-[data-theme="dark"] .zhihuE_SettingRoot {color: #adbac7;background-color: #343A44;}
-[data-theme="dark"] .zhihuE_SettingHeader {color: #d0d0d0;background-color: #2D333B;}
-[data-theme="dark"] .zhihuE_SettingMain hr {border: 0.5px solid #2d333b;}</style>
-        <div class="zhihuE_SettingBackdrop_1"><div class="zhihuE_SettingBackdrop_2"></div><div class="zhihuE_SettingRoot">
-            <div class="zhihuE_SettingHeader">${title}<span class="zhihuE_SettingClose" title="点击关闭"><svg class="Zi Zi--Close Modal-closeIcon" fill="currentColor" viewBox="0 0 24 24" width="24" height="24"><path d="M13.486 12l5.208-5.207a1.048 1.048 0 0 0-.006-1.483 1.046 1.046 0 0 0-1.482-.005L12 10.514 6.793 5.305a1.048 1.048 0 0 0-1.483.005 1.046 1.046 0 0 0-.005 1.483L10.514 12l-5.208 5.207a1.048 1.048 0 0 0 .006 1.483 1.046 1.046 0 0 0 1.482.005L12 13.486l5.207 5.208a1.048 1.048 0 0 0 1.483-.006 1.046 1.046 0 0 0 .005-1.482L13.486 12z" fill-rule="evenodd"></path></svg></span></div>
-            <div class="zhihuE_SettingMain"><p>${tips}</p><hr>`
-    if (line) _br = '<br>'
+    let _br = '';
+    let _html = `
+    <style class="zhihuE_SettingStyle">
+        .zhihuE_SettingRoot {position: absolute;top: 50%;left: 50%;-webkit-transform: translate(-50%, -50%);-moz-transform: translate(-50%, -50%);-ms-transform: translate(-50%, -50%);-o-transform: translate(-50%, -50%);transform: translate(-50%, -50%);width: auto;min-width: 400px;max-width: 600px;height: auto;min-height: 150px;max-height: 400px;color: #535353;background-color: #fff;border-radius: 3px;}
+        .zhihuE_SettingBackdrop_1 {position: fixed;top: 0;right: 0;bottom: 0;left: 0;z-index: 203;display: -webkit-box;display: -ms-flexbox;display: flex;-webkit-box-orient: vertical;-webkit-box-direction: normal;-ms-flex-direction: column;flex-direction: column;-webkit-box-pack: center;-ms-flex-pack: center;justify-content: center;overflow-x: hidden;overflow-y: auto;-webkit-transition: opacity .3s ease-out;transition: opacity .3s ease-out;}
+        .zhihuE_SettingBackdrop_2 {position: absolute;top: 0;right: 0;bottom: 0;left: 0;z-index: 0;background-color: rgba(18,18,18,.65);-webkit-transition: background-color .3s ease-out;transition: background-color .3s ease-out;}
+        .zhihuE_SettingRoot .zhihuE_SettingHeader {padding: 10px 20px;color: #fff;font-weight: bold;background-color: #3994ff;border-radius: 3px 3px 0 0;}
+        .zhihuE_SettingRoot .zhihuE_SettingMain {padding: 10px 20px;border-radius: 0 0 3px 3px;}
+        .zhihuE_SettingHeader span {float: right;cursor: pointer;}
+        .zhihuE_SettingMain input {margin: 10px 6px 10px 0;cursor: pointer;vertical-align:middle}
+        .zhihuE_SettingMain label {margin-right: 20px;user-select: none;cursor: pointer;vertical-align:middle}
+        .zhihuE_SettingMain hr {border: 0.5px solid #f4f4f4;}
+        [data-theme="dark"] .zhihuE_SettingRoot {color: #adbac7;background-color: #343A44;}
+        [data-theme="dark"] .zhihuE_SettingHeader {color: #d0d0d0;background-color: #2D333B;}
+        [data-theme="dark"] .zhihuE_SettingMain hr {border: 0.5px solid #2d333b;}
+    </style>
+        <div class="zhihuE_SettingBackdrop_1">
+            <div class="zhihuE_SettingBackdrop_2">
+            </div>
+            <div class="zhihuE_SettingRoot">
+                <div class="zhihuE_SettingHeader">${title}
+                    <span class="zhihuE_SettingClose" title="点击关闭">
+                        <svg class="Zi Zi--Close Modal-closeIcon" fill="currentColor" viewBox="0 0 24 24" width="24" height="24">
+                            <path d="M13.486 12l5.208-5.207a1.048 1.048 0 0 0-.006-1.483 1.046 1.046 0 0 0-1.482-.005L12 10.514 6.793 5.305a1.048 1.048 0 0 0-1.483.005 1.046 1.046 0 0 0-.005 1.483L10.514 12l-5.208 5.207a1.048 1.048 0 0 0 .006 1.483 1.046 1.046 0 0 0 1.482.005L12 13.486l5.207 5.208a1.048 1.048 0 0 0 1.483-.006 1.046 1.046 0 0 0 .005-1.482L13.486 12z" fill-rule="evenodd">
+                            </path>
+                        </svg>
+                    </span>
+                </div>
+            <div class="zhihuE_SettingMain"><p>${tips}</p><hr>
+    `
+    if (line) {_br = '<br>'}
     for (let i=0; i<menu.length; i++) {
         if (GM_getValue(menu[i][0])) {
             _html += `<label><input name="zhihuE_Setting" type="checkbox" value="${menu[i][0]}" checked="checked">${menu[i][1]}</label>${_br}`
@@ -131,9 +199,12 @@ function menu_setting(type, title, tips, line, menu) {
             _html += `<label><input name="zhihuE_Setting" type="checkbox" value="${menu[i][0]}">${menu[i][1]}</label>${_br}`
         }
     }
+
     _html += `</div></div></div>`
-    document.body.insertAdjacentHTML('beforeend', _html); // 插入网页末尾
-    setTimeout(function() { // 延迟 100 毫秒，避免太快
+    // 插入网页末尾
+    document.body.insertAdjacentHTML('beforeend', _html); 
+    // 延迟设置为 100 毫秒，防止太快
+    setTimeout(function() { 
         // 关闭按钮 点击事件
         document.querySelector('.zhihuE_SettingClose').onclick = function(){this.parentElement.parentElement.parentElement.remove();document.querySelector('.zhihuE_SettingStyle').remove();}
         // 点击周围空白处 = 点击关闭按钮
@@ -203,6 +274,7 @@ function getCollapsedAnswerObserver() {
 
 // 默认收起回答
 function defaultCollapsedAnswer() {
+    // Return immed if 
     if (!menu_value('menu_defaultCollapsedAnswer')) return
     const observer = getCollapsedAnswerObserver();
     if (location.href.indexOf('/answer/') === -1) {
@@ -256,10 +328,11 @@ function collapsedAnswer() {
     }
 }
 
-
+//TODO try to "de-nest" this heavily nested function
 // 收起当前回答、评论（监听点击事件，点击网页两侧空白处）
 function collapsedNowAnswer(selectors) {
-    backToTop(selectors) // 快捷回到顶部
+    // 快捷回到顶部
+    backToTop(selectors) 
     if (!menu_value('menu_collapsedNowAnswer')) return
     document.querySelector(selectors).onclick = function(event){
         if (event.target == this) {
@@ -383,6 +456,7 @@ function collapsedNowAnswer(selectors) {
 
 
 // 回到顶部（监听点击事件，鼠标右键点击网页两侧空白处）
+// Mouse click white space on both sides to return to top
 function backToTop(selectors) {
     if (!menu_value('menu_backToTop')) return
     document.querySelector(selectors).oncontextmenu = function(event){
@@ -404,13 +478,14 @@ function isElementInViewport(el) {
         rect.right <= (window.innerWidth || document.documentElement.clientWidth)
     );
 }
+
 //获取元素是否在可视区域（部分可见）
 function isElementInViewport_(el) {
     let rect = el.getBoundingClientRect();
     return (
     rect.top < (window.innerHeight || document.documentElement.clientHeight) &&
     rect.bottom > 0
-  );
+);
 }
 
 
@@ -419,7 +494,11 @@ function customBlockUsers() {
     let nowBlockUsers = '';
     menu_value('menu_customBlockUsers').forEach(function(item){nowBlockUsers += '|' + item})
     //console.log(nowBlockUsers.replace('|',''))
-    let newBlockUsers = prompt('编辑 [自定义屏蔽用户]\n（不同用户名之间使用 "|" 分隔，例如：用户A|用户B|用户C ）', nowBlockUsers.replace('|',''));
+    let newBlockUsers = prompt(
+        '编辑 [自定义屏蔽用户]\n（不同用户名之间使用 "|" 分隔，例如：用户A|用户B|用户C ）',
+        nowBlockUsers.replace('|','')
+    );
+
     if (newBlockUsers === '') {
         GM_setValue('menu_customBlockUsers', []);
         registerMenuCommand(); // 重新注册脚本菜单
@@ -429,7 +508,7 @@ function customBlockUsers() {
     }
 };
 
-
+//TODO This function looks way too big. Try to 
 // 屏蔽指定用户
 function blockUsers(type) {
     if (!menu_value('menu_blockUsers')) return
@@ -640,6 +719,7 @@ function blockUsers(type) {
     }
 
 
+    //? 这是不是其实就是原来的屏蔽用户的一个快捷方式？
     // 添加屏蔽用户按钮（用户信息悬浮框中）
     function blockUsers_button() {
         const callback = (mutationsList, observer) => {
@@ -733,7 +813,10 @@ function blockUsers(type) {
 function customBlockKeywords() {
     let nowBlockKeywords = '';
     menu_value('menu_customBlockKeywords').forEach(function(item){nowBlockKeywords += '|' + item})
-    let newBlockKeywords = prompt('编辑 [自定义屏蔽关键词]\n（不同关键词之间使用 "|" 分隔，例如：关键词A|关键词B|关键词C \n（关键词不区分大小写，支持表情如：[捂脸]|[飙泪笑]', nowBlockKeywords.replace('|',''));
+    let newBlockKeywords = prompt(
+        '编辑 [自定义屏蔽关键词]\n（不同关键词之间使用 "|" 分隔，例如：关键词A|关键词B|关键词C \n（关键词不区分大小写，支持表情如：[捂脸]|[飙泪笑]', 
+        nowBlockKeywords.replace('|','')
+    );
     if (newBlockKeywords === '') {
         GM_setValue('menu_customBlockKeywords', []);
         registerMenuCommand(); // 重新注册脚本菜单
@@ -743,7 +826,7 @@ function customBlockKeywords() {
     }
 };
 
-
+//TODO This function looks too big. Try to disassemble it.
 // 屏蔽指定关键词
 function blockKeywords(type) {
     if (!menu_value('menu_blockKeywords')) return
@@ -1055,14 +1138,16 @@ function blockYanXuan() {
 function addTypeTips() {
     if (!menu_value('menu_typeTips')) return
     let style = `font-weight: bold;font-size: 13px;padding: 1px 4px 0;border-radius: 2px;display: inline-block;vertical-align: top;margin: ${(location.pathname === '/search') ? '2' : '4'}px 4px 0 0;`
-    document.body.appendChild(document.createElement('style')).textContent = `/* 区分问题文章 */
+    document.body.appendChild(document.createElement('style')).textContent = `
+    /* 区分问题文章 */
 .AnswerItem .ContentItem-title a:not(.zhihu_e_toQuestion)::before {content:'问题';color: #f68b83;background-color: #f68b8333;${style}}
 .TopstoryQuestionAskItem .ContentItem-title a:not(.zhihu_e_toQuestion)::before {content:'问题';color: #ff5a4e;background-color: #ff5a4e33;${style}}
 .ZVideoItem .ContentItem-title a::before, .ZvideoItem .ContentItem-title a::before {content:'视频';color: #00BCD4;background-color: #00BCD433;${style}}
-.ArticleItem .ContentItem-title a::before {content:'文章';color: #2196F3;background-color: #2196F333;${style}}`;
+.ArticleItem .ContentItem-title a::before {content:'文章';color: #2196F3;background-color: #2196F333;${style}}
+    `;
 }
 
-
+//? 这个功能看起来没有什么作用呀
 // 直达问题按钮
 function addToQuestion() {
     if (!menu_value('menu_toQuestion')) return
