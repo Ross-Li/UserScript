@@ -35,7 +35,10 @@ var menu_ALL = [
     ['menu_collapsedNowAnswer', '快捷收起回答/评论 (点击两侧空白处)', '快捷收起回答/评论', true],
     ['menu_backToTop', '快捷回到顶部 (右键两侧空白处)', '快捷回到顶部', true],
     ['menu_blockUsers', '屏蔽指定用户', '屏蔽指定用户', true],
-    ['menu_customBlockUsers', '自定义屏蔽用户', '自定义屏蔽用户', ['故事档案局', '盐选推荐', '盐选科普', '盐选成长计划', '知乎盐选会员', '知乎盐选创作者', '盐选心理', '盐选健康必修课', '盐选奇妙物语', '盐选生活馆', '盐选职场', '盐选文学甄选', '盐选作者小管家', '盐选博物馆', '盐选点金', '盐选测评室', '盐选科技前沿', '盐选会员精品']],
+    ['menu_customBlockUsers', '自定义屏蔽用户', '自定义屏蔽用户', 
+        ['故事档案局', '盐选推荐', '盐选科普', '盐选成长计划', '知乎盐选会员', '知乎盐选创作者', '盐选心理', '盐选健康必修课', 
+         '盐选奇妙物语', '盐选生活馆', '盐选职场', '盐选文学甄选', '盐选作者小管家', '盐选博物馆', '盐选点金', '盐选测评室', 
+         '盐选科技前沿', '盐选会员精品']],
     ['menu_blockKeywords', '屏蔽指定关键词', '屏蔽指定关键词', true],
     ['menu_customBlockKeywords', '自定义屏蔽关键词', '自定义屏蔽关键词', []],
     ['menu_blockType', '屏蔽指定类别 (视频/文章等)', '勾选 = 屏蔽该类别的信息流', ''],
@@ -50,8 +53,9 @@ var menu_ALL = [
     ['menu_publishTop', '置顶显示时间', '置顶显示时间', true],
     ['menu_typeTips', '区分问题文章', '区分问题文章', true],
     ['menu_toQuestion', '直达问题按钮', '直达问题按钮', true]
-], menu_ID = [];
-for (let i=0;i<menu_ALL.length;i++){ // 如果读取到的值为 null 就写入默认值
+]
+var menu_ID = [];
+for (let i=0; i<menu_ALL.length; i++){ // 如果读取到的值为 null 就写入默认值
     if (GM_getValue(menu_ALL[i][0]) == null){GM_setValue(menu_ALL[i][0], menu_ALL[i][3])};
 }
 registerMenuCommand();
